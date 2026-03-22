@@ -37,7 +37,7 @@ router.post('/process-custom', upload.any(), async (req: Request, res: Response)
 });
 
 router.get('/download/:filename', async (req: Request, res: Response) => {
-  const { filename } = req.params;
+  const filename = req.params.filename as string;
   const filePath = await processorService.getZipPath(filename);
   if (filePath) {
     res.download(filePath);
