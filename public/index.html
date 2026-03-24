@@ -3,192 +3,150 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Creative Studio</title>
+    <title>AI Studio | Image Generation Wizard</title>
+    <link rel="stylesheet" href="css/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-          rel="stylesheet">
-    <link rel="stylesheet"
-          href="/css/styles.css">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
-<body>
-<div class="container">
-
-    <!-- ── HEADER ── -->
-    <div class="neo-card header">
-        <h1>✦ AI Creative Studio</h1>
-        <p class="subtitle">
-            Generuj profesjonalne kreacje produktowe z pomocą Gemini AI
-        </p>
+<body class="dark-theme">
+    <!-- Login Overlay -->
+    <div id="login-overlay" class="overlay">
+        <div class="login-card">
+            <h1>Witaj w Studio AI</h1>
+            <p>Wprowadź swój kod PIN, aby rozpocząć tworzenie.</p>
+            <div class="pin-input-group">
+                <input type="password" id="pin-input" maxlength="4" placeholder="••••" autofocus>
+                <button id="login-btn">Zaloguj</button>
+            </div>
+            <p id="login-error" class="error-msg"></p>
+        </div>
     </div>
 
-    <!-- ── MAIN CARD ── -->
-    <div class="neo-card">
-
-        <!-- Error -->
-        <div id="errorMessage" class="alert alert-error" style="display:none;"></div>
-
-        <!-- Tabs -->
-        <div class="mode-tabs">
-            <button class="mode-tab active" id="tab-drive"
-                    onclick="switchMode('drive')">
-                <span class="tab-icon">☁️</span>
-                <span class="tab-label">Google Drive</span>
-                <span class="tab-desc">Folder z produktami</span>
-            </button>
-            <button class="mode-tab" id="tab-upload"
-                    onclick="switchMode('upload')">
-                <span class="tab-icon">⬆️</span>
-                <span class="tab-label">Upload</span>
-                <span class="tab-desc">Prześlij zdjęcia</span>
-            </button>
-            <button class="mode-tab" id="tab-custom"
-                    onclick="switchMode('custom')">
-                <span class="tab-icon">✏️</span>
-                <span class="tab-label">Custom Prompt</span>
-                <span class="tab-desc">Własna scena</span>
-            </button>
-        </div>
-
-        <!-- ══ DRIVE MODE ══ -->
-        <div id="mode-drive">
-            <div class="instructions">
-                <h3>⚡ Jak to działa</h3>
-                <ol>
-                    <li>Wklej link do folderu Google Drive z podfolderami produktów</li>
-                    <li>Każdy podfolder = jeden produkt (może zawierać wiele zdjęć)</li>
-                    <li>AI analizuje zdjęcia i generuje 4 kreacje na produkt</li>
-                    <li>Pobierz gotowy pakiet ZIP ze wszystkimi kreacjami</li>
-                </ol>
+    <!-- Main Application Wizard -->
+    <div id="app-container" class="hidden">
+        
+        <!-- Top Navigation Bar -->
+        <header class="top-nav">
+            <div class="logo">Studio AI</div>
+            <div class="step-indicator">
+                <span class="step active" id="indicator-step1">1. Wybierz styl</span>
+                <span class="step-divider">></span>
+                <span class="step" id="indicator-step2">2. Konfiguracja</span>
+                <span class="step-divider">></span>
+                <span class="step" id="indicator-step3">3. Wyniki</span>
             </div>
-
-            <div class="input-group">
-                <label class="input-label" for="folderLink">
-                    🔗 Link do folderu Google Drive
-                </label>
-                <input
-                    class="neo-input"
-                    type="text"
-                    id="folderLink"
-                    placeholder="https://drive.google.com/drive/folders/..."
-                    autocomplete="off"
-                    spellcheck="false"
-                >
-                <p class="input-hint">
-                    Folder musi być publiczny lub udostępniony przez link
-                </p>
+            <div class="user-info">
+                <div id="user-limit">Limit: 0/0</div>
+                <button id="logout-btn" class="btn-text">Wyloguj</button>
             </div>
-        </div>
+        </header>
 
-        <!-- ══ UPLOAD MODE ══ -->
-        <div id="mode-upload" style="display:none;">
-            <div class="instructions">
-                <h3>⚡ Jak to działa</h3>
-                <ol>
-                    <li>Dodaj osoby lub produkty — każde w osobnym secie</li>
-                    <li>Wgraj od 1 do 4 zdjęć referencyjnych</li>
-                    <li>Podaj zawód lub krótki opis</li>
-                    <li>AI wygeneruje 4 profesjonalne kreacje dla każdego</li>
-                </ol>
-            </div>
-
-            <div id="personsContainer"></div>
-
-            <button class="btn-add-person" onclick="addPersonSet()">
-                <span>＋</span>
-                Dodaj kolejną osobę / produkt
-            </button>
-        </div>
-
-        <!-- ══ CUSTOM MODE ══ -->
-        <div id="mode-custom" style="display:none;">
-            <div class="instructions">
-                <h3>⚡ Jak to działa</h3>
-                <ol>
-                    <li>Napisz dowolny prompt opisujący scenę lub produkt</li>
-                    <li>Opcjonalnie dołącz do 4 zdjęć referencyjnych</li>
-                    <li>AI wygeneruje 4 unikalne warianty obrazu</li>
-                </ol>
-            </div>
-
-            <div class="input-group">
-                <label class="input-label" for="customPrompt">
-                    📝 Twój prompt
-                </label>
-                <textarea
-                    class="neo-textarea custom-prompt-area"
-                    id="customPrompt"
-                    rows="5"
-                    placeholder="Opisz scenę, produkt lub postać… np. 'A bottle of premium water placed on ice rocks, surrounded by fresh mint, dark moody background, 8k, photorealistic'"
-                ></textarea>
-                <p class="input-hint">
-                    Użyj <kbd
-                        style="font-size:11px;padding:1px 6px;
-                               background:var(--bg-elevated);
-                               border:1px solid var(--border-soft);
-                               border-radius:4px;color:var(--text-secondary);"
-                    >Ctrl + Enter</kbd>
-                    aby od razu uruchomić generowanie
-                </p>
-            </div>
-
-            <div class="input-group">
-                <label class="input-label">
-                    📷 Zdjęcia referencyjne
-                    <span class="optional-badge">opcjonalne</span>
-                </label>
-                <div class="custom-ref-grid" id="customRefGrid"></div>
-                <p class="input-hint">
-                    Zdjęcia referencyjne pomagają AI zachować spójność stylu
-                </p>
-            </div>
-        </div>
-
-        <!-- ── PROCESS BUTTON ── -->
-        <button class="btn neo-button" id="processBtn"
-                onclick="startProcessing()">
-            <span class="btn-icon">🚀</span>
-            <span class="btn-text">Generuj Kreacje</span>
-        </button>
-
-        <!-- ── PROGRESS ── -->
-        <div class="progress-container" id="progressContainer">
-            <div class="neo-progress">
-                <div class="progress-fill" id="progressFill" style="width:0%">
-                    <span class="progress-text">0%</span>
+        <main class="wizard-content">
+            <!-- STEP 1: Select Style -->
+            <section id="step1-zone" class="wizard-step active-step">
+                <div class="step-header">
+                    <h2>Wybierz kafelek ze stylem</h2>
+                    <p>Wybierz jeden z gotowych stylów lub "Własny prompt", aby stworzyć coś unikalnego.</p>
                 </div>
-            </div>
-            <div class="status-message" id="statusMessage"></div>
-        </div>
+                <div id="styles-list-fullscreen" class="styles-grid-fullscreen">
+                    <!-- Styles injected here -->
+                </div>
+            </section>
 
-        <!-- ── PRODUCT LIST ── -->
-        <div class="product-list" id="productList"></div>
+            <!-- STEP 2: Configure & Upload -->
+            <section id="step2-zone" class="wizard-step hidden">
+                <div class="step-header">
+                    <button id="back-to-step1-btn" class="btn-outline">← Wróć do wyboru stylu</button>
+                    <h2>Dodaj zdjęcia i konfiguruj</h2>
+                    <p id="selected-style-label" class="highlight-text">Wybrany styl: ...</p>
+                </div>
 
-        <!-- ── PREVIEW ── -->
-        <div class="preview-section" id="previewSection" style="display:none;">
-            <div class="preview-title">✦ Podgląd kreacji</div>
-            <div class="preview-grid" id="previewGrid"></div>
-        </div>
+                <div class="config-container">
+                    <!-- Upload Area -->
+                    <div class="upload-section">
+                        <h3>Zdjęcia referencyjne</h3>
+                        <div id="upload-zone" class="upload-zone">
+                            <input type="file" id="file-input" accept="image/*" multiple hidden>
+                            <div id="drop-area">
+                                <div class="icon">📸</div>
+                                <h3>Przeciągnij zdjęcia produktu</h3>
+                                <p>lub kliknij, aby wybrać z dysku (max. 5)</p>
+                            </div>
+                            <!-- Image Previews -->
+                            <div id="image-preview-container" class="image-preview-container hidden">
+                                <div id="previews-grid" class="previews-grid"></div>
+                                <button id="add-more-images-btn" class="btn-outline btn-small">+ Dodaj więcej</button>
+                            </div>
+                        </div>
+                    </div>
 
-        <!-- ── DOWNLOAD ── -->
-        <div class="download-section" id="downloadSection">
-            <div class="download-icon">📦</div>
-            <h3>Kreacje gotowe!</h3>
-            <p class="download-description">
-                Wszystkie pliki zostały spakowane i są gotowe do pobrania
-            </p>
-            <button class="btn neo-button download" id="downloadBtn">
-                <span class="btn-icon">⬇️</span>
-                <span class="btn-text">Pobierz pakiet ZIP</span>
-            </button>
-        </div>
+                    <!-- Settings Area -->
+                    <div class="settings-section">
+                        <!-- Custom Prompt (Conditional) -->
+                        <div id="custom-prompt-container" class="settings-group hidden">
+                            <h3>Własny opis (Prompt)</h3>
+                            <textarea id="custom-prompt-input" placeholder="Opisz swoje wymarzone tło... (np. 'Produkt na marmurowym blacie z płatkami róż, oświetlenie studyjne')"></textarea>
+                        </div>
 
-        <!-- ── LOG ── -->
-        <div class="log-container" id="logContainer"></div>
+                        <div class="settings-group">
+                            <h3>Proporcje obrazu</h3>
+                            <div class="radio-group" id="aspect-ratio-group">
+                                <label><input type="radio" name="aspectRatio" value="1:1" checked> 1:1 (Kwadrat)</label>
+                                <label><input type="radio" name="aspectRatio" value="16:9"> 16:9 (Poziom)</label>
+                                <label><input type="radio" name="aspectRatio" value="9:16"> 9:16 (Pion)</label>
+                                <label><input type="radio" name="aspectRatio" value="4:3"> 4:3</label>
+                                <label><input type="radio" name="aspectRatio" value="3:4"> 3:4</label>
+                            </div>
+                        </div>
 
-    </div><!-- /neo-card -->
+                        <div class="settings-group">
+                            <h3>Rozdzielczość</h3>
+                            <div class="radio-group" id="resolution-group">
+                                <label><input type="radio" name="resolution" value="1K"> 1K</label>
+                                <label><input type="radio" name="resolution" value="2K"> 2K</label>
+                                <label><input type="radio" name="resolution" value="4K" checked> 4K</label>
+                            </div>
+                        </div>
 
-</div><!-- /container -->
+                        <div id="generate-action" class="generate-action">
+                            <button id="generate-btn" class="btn-primary btn-large">Generuj 4 warianty</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
 
-<script src="/js/script.js"></script>
+            <!-- STEP 3: Processing & Results -->
+            <section id="step3-zone" class="wizard-step hidden">
+                <!-- Processing State -->
+                <div id="processing-state" class="processing-state">
+                    <div class="loader-container">
+                        <div class="spinner"></div>
+                        <h3 id="process-status">Przetwarzanie...</h3>
+                        <div class="progress-container">
+                            <div id="progress-bar-fill" class="progress-bar-fill" style="width: 0%"></div>
+                        </div>
+                        <p id="process-progress">Twoje zadanie jest w kolejce</p>
+                    </div>
+                </div>
+
+                <!-- Results State -->
+                <div id="result-state" class="result-state hidden">
+                    <div class="step-header">
+                        <h2>Gotowe! Oto Twoje kreacje</h2>
+                    </div>
+                    <div id="results-grid" class="results-grid">
+                        <!-- Variants injected here -->
+                    </div>
+                    <div class="result-actions">
+                        <a id="download-zip-btn" href="#" class="btn-primary" download>Pobierz wszystko (ZIP)</a>
+                        <button id="finish-btn" class="btn-outline">Zakończ i wróć na start</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="js/app.js"></script>
 </body>
 </html>

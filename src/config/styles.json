@@ -1,0 +1,68 @@
+[
+  {
+    "id": "custom",
+    "name": "Własny prompt (Custom)",
+    "thumbnail": "https://placehold.co/400x300/333333/ffffff?text=Twój+Opis",
+    "systemPrompt": "CUSTOM"
+  },
+  {
+    "id": "pure_white",
+    "name": "Pure White Studio",
+    "thumbnail": "/images/styles/Pure White Studio.jpg",
+    "systemPrompt": "Place the product on a perfectly solid white background. Professional e-commerce photography, soft studio lighting from the top, subtle natural shadows on the floor, high-end commercial look, clean edges."
+  },
+  {
+    "id": "luxury_marble",
+    "name": "Luxury Marble",
+    "thumbnail": "/images/styles/Luxury Marble.jpg",
+    "systemPrompt": "Place the product on a white marble surface with elegant grey veins. Soft, diffused professional lighting, blurred luxury bathroom or boutique background, high-end cosmetic photography style."
+  },
+  {
+    "id": "modern_tech",
+    "name": "Modern Tech",
+    "thumbnail": "/images/styles/Modern Tech.jpg",
+    "systemPrompt": "Place the product on a dark reflective surface. Cyberpunk aesthetic, subtle blue and purple neon rim lights, sharp shadows, futuristic tech studio, 8k resolution, cinematic lighting."
+  },
+  {
+    "id": "organic_nature",
+    "name": "Organic Nature",
+    "thumbnail": "/images/styles/Organic Nature.jpg",
+    "systemPrompt": "Place the product on a raw light wood surface. Surrounded by blurred green monstera leaves and natural sunlight filtering through a window, earthy tones, eco-friendly product photography."
+  },
+  {
+    "id": "industrial_loft",
+    "name": "Industrial Loft",
+    "thumbnail": "/images/styles/Industrial Loft.jpg",
+    "systemPrompt": "Place the product in a modern industrial loft setting. Grey concrete background, warm Edison bulb lighting, brick wall in the bokeh background, urban professional style."
+  },
+  {
+    "id": "soft_pastel",
+    "name": "Soft Pastel",
+    "thumbnail": "/images/styles/Soft Pastel.jpg",
+    "systemPrompt": "Place the product on a soft matte pink surface. Minimalist pastel background, very soft shadowless lighting, trendy aesthetic, perfect for Gen Z fashion or beauty brands."
+  },
+  {
+    "id": "kitchen_counter",
+    "name": "Kitchen Counter",
+    "thumbnail": "/images/styles/Kitchen Counter.jpg",
+    "systemPrompt": "Place the product on a modern granite kitchen countertop. Blurred kitchen background with white tiles and some ingredients, morning sunlight, cozy home cooking atmosphere."
+  },
+  {
+    "id": "scandi_living",
+    "name": "Scandinavian Living",
+    "thumbnail": "/images/styles/Scandi Living.jpg",
+    "systemPrompt": "Place the product on a light oak coffee table. Bright Scandinavian living room background, white walls, soft textiles, airy and bright atmosphere, minimalist home decor style."
+  },
+  {
+    "id": "zen_garden",
+    "name": "Zen Wellness",
+    "thumbnail": "/images/styles/Zen Wellness.jpg",
+    "systemPrompt": "Place the product on smooth black river stones. Background with blurred bamboo and water ripples, spa atmosphere, calm and relaxing lighting, green accents."
+  },
+  {
+    "id": "sunny_beach",
+    "name": "Sunny Beach",
+    "thumbnail": "/images/styles/Sunny Beach.jpg",
+    "systemPrompt": "Place the product on fine white sand. Bright summer sunlight, blurred turquoise ocean in the background, sharp shadows, holiday and travel vibe, vibrant colors."
+  }
+]
