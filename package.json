@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node dist/index.js",
     "dev": "nodemon src/index.ts",
-    "build": "tsc",
+    "build": "npx prisma generate && npx prisma db push --accept-data-loss && npm run seed && tsc",
     "seed": "ts-node scripts/seed.ts"
   },
   "keywords": [],
