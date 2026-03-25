@@ -7,8 +7,24 @@ exports.authRouter = void 0;
 const express_1 = require("express");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const db_1 = require("../services/db");
+const auth_1 = require("../middleware/auth");
 exports.authRouter = (0, express_1.Router)();
 const JWT_SECRET = process.env.JWT_SECRET || 'default_secret';
+exports.authRouter.get('/me', auth_1.authenticateToken, async (req, res) => {
+    try {
+        const user = await db_1.prisma.user.findUnique({
+            where: { id: req.user?.id }
+        });
+        if (!user) {
+            res.status(404).json({ error: 'Nie znaleziono użytkownika' });
+            return;
+        }
+        res.json({ id: user.id, dailyLimit: user.dailyLimit, usedToday: user.usedToday });
+    }
+    catch (error) {
+        res.status(500).json({ error: 'Błąd pobierania danych użytkownika' });
+    }
+});
 exports.authRouter.post('/login', async (req, res) => {
     const { pin } = req.body;
     if (!pin) {

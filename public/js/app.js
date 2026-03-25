@@ -49,6 +49,7 @@ const finishBtn = document.getElementById('finish-btn');
 document.addEventListener('DOMContentLoaded', () => {
     if (authToken) {
         showApp();
+        fetchUserStatus();
     }
 });
 
@@ -352,7 +353,22 @@ function startSSE(taskId) {
 }
 
 async function fetchUserStatus() {
-    // Placeholder - would call api to get latest usedToday
+    if (!authToken) return;
+    try {
+        const response = await fetch('/api/auth/me', {
+            headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+        if (response.ok) {
+            const user = await response.json();
+            updateLimitDisplay(user);
+        } else {
+            if (response.status === 401 || response.status === 403) {
+                logout();
+            }
+        }
+    } catch (err) {
+        console.error('Błąd pobierania statusu użytkownika:', err);
+    }
 }
 
 function showResults(urls, zipUrl) {

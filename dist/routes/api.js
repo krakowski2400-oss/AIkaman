@@ -18,9 +18,14 @@ exports.apiRouter = (0, express_1.Router)();
 // Zrzucanie wgrywanego pliku na dysk tylko na czas przetwarzania
 const upload = (0, multer_1.default)({ dest: 'temp_processing/' });
 exports.apiRouter.get('/styles', (req, res) => {
-    const stylesPath = path_1.default.join(__dirname, '../config/styles.json');
-    const styles = JSON.parse(fs_1.default.readFileSync(stylesPath, 'utf-8'));
-    res.json(styles);
+    const stylesPath = path_1.default.join(process.cwd(), 'src/config/styles.json');
+    try {
+        const styles = JSON.parse(fs_1.default.readFileSync(stylesPath, 'utf-8'));
+        res.json(styles);
+    }
+    catch (error) {
+        res.status(500).json({ error: 'Nie udało się załadować stylów' });
+    }
 });
 exports.apiRouter.post('/generate', auth_1.authenticateToken, upload.array('images', 5), async (req, res) => {
     const files = req.files;
@@ -39,7 +44,7 @@ exports.apiRouter.post('/generate', auth_1.authenticateToken, upload.array('imag
         where: { id: userId },
         data: { usedToday: user.usedToday + 1 }
     });
-    const stylesPath = path_1.default.join(__dirname, '../config/styles.json');
+    const stylesPath = path_1.default.join(process.cwd(), 'src/config/styles.json');
     const styles = JSON.parse(fs_1.default.readFileSync(stylesPath, 'utf-8'));
     const selectedStyle = styles.find((s) => s.id === styleId);
     if (!selectedStyle) {

@@ -1,9 +1,27 @@
 import { Router, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import { prisma } from '../services/db';
+import { authenticateToken, AuthRequest } from '../middleware/auth';
 
 export const authRouter = Router();
 const JWT_SECRET = process.env.JWT_SECRET || 'default_secret';
+
+authRouter.get('/me', authenticateToken, async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: req.user?.id }
+    });
+
+    if (!user) {
+      res.status(404).json({ error: 'Nie znaleziono użytkownika' });
+      return;
+    }
+
+    res.json({ id: user.id, dailyLimit: user.dailyLimit, usedToday: user.usedToday });
+  } catch (error) {
+    res.status(500).json({ error: 'Błąd pobierania danych użytkownika' });
+  }
+});
 
 authRouter.post('/login', async (req: Request, res: Response): Promise<void> => {
   const { pin } = req.body;

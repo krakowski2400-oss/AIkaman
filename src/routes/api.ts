@@ -15,9 +15,13 @@ export const apiRouter = Router();
 const upload = multer({ dest: 'temp_processing/' });
 
 apiRouter.get('/styles', (req, res) => {
-  const stylesPath = path.join(__dirname, '../config/styles.json');
-  const styles = JSON.parse(fs.readFileSync(stylesPath, 'utf-8'));
-  res.json(styles);
+  const stylesPath = path.join(process.cwd(), 'src/config/styles.json');
+  try {
+    const styles = JSON.parse(fs.readFileSync(stylesPath, 'utf-8'));
+    res.json(styles);
+  } catch (error) {
+    res.status(500).json({ error: 'Nie udało się załadować stylów' });
+  }
 });
 
 apiRouter.post('/generate', authenticateToken, upload.array('images', 5), async (req: AuthRequest, res): Promise<any> => {
@@ -41,7 +45,7 @@ apiRouter.post('/generate', authenticateToken, upload.array('images', 5), async 
     data: { usedToday: user.usedToday + 1 }
   });
 
-  const stylesPath = path.join(__dirname, '../config/styles.json');
+  const stylesPath = path.join(process.cwd(), 'src/config/styles.json');
   const styles = JSON.parse(fs.readFileSync(stylesPath, 'utf-8'));
   const selectedStyle = styles.find((s: any) => s.id === styleId);
 

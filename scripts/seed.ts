@@ -5,19 +5,18 @@ const prisma = new PrismaClient();
 async function main() {
   const pin = '1234'; // Domyślny PIN do pierwszego logowania
 
-  const existingUser = await prisma.user.findUnique({ where: { pin } });
-
-  if (!existingUser) {
-    const user = await prisma.user.create({
-      data: {
-        pin: pin,
-        dailyLimit: 1000, // 1000 pakietów wariantów na czas testów
-      },
-    });
-    console.log(`Utworzono domyślnego użytkownika z kodem PIN: ${user.pin}`);
-  } else {
-    console.log(`Użytkownik z kodem PIN ${pin} już istnieje.`);
-  }
+  const user = await prisma.user.upsert({
+    where: { pin },
+    update: {
+      dailyLimit: 100, // Wymuszamy 100 pakietów wariantów na czas testów
+    },
+    create: {
+      pin: pin,
+      dailyLimit: 100,
+    },
+  });
+  
+  console.log(`Zaktualizowano/utworzono użytkownika z kodem PIN: ${user.pin} (Limit: ${user.dailyLimit})`);
 }
 
 main()
