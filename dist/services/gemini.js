@@ -9,7 +9,9 @@ const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 // Inicjalizacja klienta Gemini
 const genAI = new generative_ai_1.GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
-async function processImageGeneration(taskId, imagePaths, stylePrompt, aspectRatio = "1:1", imageSize = "4K") {
+async function processImageGeneration(taskId, imagePaths, stylePrompt, aspectRatio = "1:1", imageSize = "4K", onProgress) {
+    if (onProgress)
+        onProgress('Analizowanie zdjęcia produktu (Gemini)...');
     console.log(`Zadanie ${taskId}: Rozpoczynam inteligentną analizę produktu...`);
     const textModel = genAI.getGenerativeModel({ model: 'models/gemini-2.5-pro' });
     const imageModel = genAI.getGenerativeModel({ model: 'models/gemini-3-pro-image-preview' });
@@ -28,7 +30,7 @@ async function processImageGeneration(taskId, imagePaths, stylePrompt, aspectRat
             }
         };
     });
-    // KROK 1: Analiza obrazu i wygenerowanie 4 RÓŻNYCH koncepcji (tak jak w Analizie)
+    // KROK 1: Analiza obrazu i wygenerowanie 4 RÓŻNYCH koncepcji
     const analysisPrompt = `Działaj jako ekspert fotografii produktowej. Przeanalizuj załączone zdjęcia produktu i stwórz 4 UNIKALNE prompty w języku angielskim, aby umieścić ten produkt w nowej scenie o stylu: ${stylePrompt}.
   
   Zasady:
@@ -49,12 +51,14 @@ async function processImageGeneration(taskId, imagePaths, stylePrompt, aspectRat
     fs_1.default.mkdirSync(outputDir, { recursive: true });
     for (let i = 0; i < individualPrompts.length; i++) {
         const currentPrompt = individualPrompts[i];
+        if (onProgress)
+            onProgress(`Generowanie wariantu ${i + 1} z 4...`);
         console.log(`Zadanie ${taskId}: Generuję wariant ${i + 1} z promptem: ${currentPrompt.substring(0, 40)}...`);
         try {
             const result = await imageModel.generateContent({
                 contents: [{ role: 'user', parts: [{ text: currentPrompt }, ...imageParts] }],
                 generationConfig: {
-                    // @ts-ignore - sprawdzone parametry z wersji Analiza
+                    // @ts-ignore
                     imageConfig: {
                         aspectRatio: aspectRatio,
                         imageSize: imageSize

@@ -53,9 +53,8 @@ exports.apiRouter.post('/generate', auth_1.authenticateToken, upload.array('imag
     queue_1.imageQueue.add(async () => {
         try {
             (0, queue_1.updateTask)(taskId, { status: 'processing', progress: 'Inicjalizacja modelu AI...' });
-            (0, queue_1.updateTask)(taskId, { progress: 'Generowanie 4 pięknych wariantów (Imagen)...' });
             const filePaths = files.map(f => f.path);
-            const resultUrls = await (0, gemini_1.processImageGeneration)(taskId, filePaths, finalPrompt, aspectRatio, resolution);
+            const resultUrls = await (0, gemini_1.processImageGeneration)(taskId, filePaths, finalPrompt, aspectRatio, resolution, (progressText) => (0, queue_1.updateTask)(taskId, { progress: progressText }));
             // Kasujemy oryginalne wgrane zdjęcia
             filePaths.forEach(p => {
                 if (fs_1.default.existsSync(p))
