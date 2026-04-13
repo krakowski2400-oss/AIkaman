@@ -29,6 +29,12 @@
         <!-- Top Navigation Bar -->
         <header class="top-nav">
             <div class="logo">Studio AI</div>
+            <div class="mode-switcher" style="margin-right: auto; margin-left: 30px;">
+                <select id="app-mode-select" class="btn-outline" style="padding: 5px 10px; cursor: pointer; background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-color); border-radius: 4px;">
+                    <option value="product">Fotografia Produktowa</option>
+                    <option value="slide">Tła Prezentacji</option>
+                </select>
+            </div>
             <div class="step-indicator">
                 <span class="step active" id="indicator-step1">1. Wybierz styl</span>
                 <span class="step-divider">></span>
@@ -64,7 +70,7 @@
 
                 <div class="config-container">
                     <!-- Upload Area -->
-                    <div class="upload-section">
+                    <div class="upload-section" id="upload-section-container">
                         <h3>Zdjęcia referencyjne</h3>
                         <div id="upload-zone" class="upload-zone">
                             <input type="file" id="file-input" accept="image/*" multiple hidden>
@@ -79,6 +85,13 @@
                                 <button id="add-more-images-btn" class="btn-outline btn-small">+ Dodaj więcej</button>
                             </div>
                         </div>
+                    </div>
+                    
+                    <!-- Slide Text Area (Hidden by default) -->
+                    <div class="upload-section hidden" id="slide-text-container">
+                        <h3>Treść Slajdu</h3>
+                        <p style="color: #999; font-size: 0.9rem; margin-bottom: 10px;">Wklej tytuł, podtytuł i treść slajdu. AI wygeneruje 4 tła pasujące do tego tekstu i wybranego stylu (bez dodawania tego tekstu na obrazku).</p>
+                        <textarea id="slide-content-input" placeholder="Wklej treść slajdu tutaj..." style="width: 100%; height: 250px; background: var(--bg-body); border: 1px dashed var(--border-color); border-radius: 8px; color: var(--text-main); padding: 15px; resize: vertical;"></textarea>
                     </div>
 
                     <!-- Settings Area -->

@@ -6,7 +6,7 @@ import fs from 'fs';
 import archiver from 'archiver';
 import { authenticateToken, AuthRequest } from '../middleware/auth';
 import { imageQueue, initTask, updateTask, getTask, tasks } from '../services/queue';
-import { processImageGeneration } from '../services/gemini';
+import { processImageGeneration, processSlideGeneration } from '../services/gemini';
 import { prisma } from '../services/db';
 
 export const apiRouter = Router();
@@ -26,11 +26,19 @@ apiRouter.get('/styles', (req, res) => {
 
 apiRouter.post('/generate', authenticateToken, upload.array('images', 5), async (req: AuthRequest, res): Promise<any> => {
   const files = req.files as Express.Multer.File[];
-  const { styleId, customPrompt, aspectRatio = "1:1", resolution = "4K" } = req.body;
+  const { mode = 'product', slideContent, styleId, customPrompt, aspectRatio = "1:1", resolution = "4K" } = req.body;
   const userId = req.user?.id;
 
-  if (!files || files.length === 0 || !styleId || !userId) {
-    return res.status(400).json({ error: 'Brak plików, stylu lub autoryzacji' });
+  if (mode === 'product' && (!files || files.length === 0)) {
+    return res.status(400).json({ error: 'Brak plików (wymagane w trybie produktu)' });
+  }
+  
+  if (mode === 'slide' && !slideContent) {
+    return res.status(400).json({ error: 'Brak treści slajdu' });
+  }
+
+  if (!styleId || !userId) {
+    return res.status(400).json({ error: 'Brak stylu lub autoryzacji' });
   }
 
   // Weryfikacja limitów użytkownika
@@ -63,21 +71,34 @@ apiRouter.post('/generate', authenticateToken, upload.array('images', 5), async 
   imageQueue.add(async () => {
     try {
       updateTask(taskId, { status: 'processing', progress: 'Inicjalizacja modelu AI...' });
-      
-      const filePaths = files.map(f => f.path);
-      const resultUrls = await processImageGeneration(
-        taskId, 
-        filePaths, 
-        finalPrompt, 
-        aspectRatio, 
-        resolution,
-        (progressText) => updateTask(taskId, { progress: progressText })
-      );
-      
-      // Kasujemy oryginalne wgrane zdjęcia
-      filePaths.forEach(p => {
-        if (fs.existsSync(p)) fs.unlinkSync(p);
-      });
+
+      let resultUrls: string[] = [];
+
+      if (mode === 'product') {
+        const filePaths = files.map(f => f.path);
+        resultUrls = await processImageGeneration(
+          taskId,
+          filePaths,
+          finalPrompt,
+          aspectRatio,
+          resolution,
+          (progressText) => updateTask(taskId, { progress: progressText })
+        );
+
+        // Kasujemy oryginalne wgrane zdjęcia
+        filePaths.forEach(p => {
+          if (fs.existsSync(p)) fs.unlinkSync(p);
+        });
+      } else if (mode === 'slide') {
+        resultUrls = await processSlideGeneration(
+          taskId,
+          slideContent,
+          finalPrompt,
+          aspectRatio,
+          resolution,
+          (progressText) => updateTask(taskId, { progress: progressText })
+        );
+      }
 
       // Tworzenie archiwum ZIP
       updateTask(taskId, { progress: 'Pakowanie do archiwum ZIP...' });

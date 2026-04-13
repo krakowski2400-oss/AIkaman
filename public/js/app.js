@@ -12,6 +12,7 @@ const loginBtn = document.getElementById('login-btn');
 const loginError = document.getElementById('login-error');
 const userLimitDisplay = document.getElementById('user-limit');
 const logoutBtn = document.getElementById('logout-btn');
+const appModeSelect = document.getElementById('app-mode-select');
 
 // DOM Elements - Wizard
 const step1Zone = document.getElementById('step1-zone');
@@ -27,6 +28,9 @@ const stylesListFullscreen = document.getElementById('styles-list-fullscreen');
 // DOM Elements - Step 2
 const backToStep1Btn = document.getElementById('back-to-step1-btn');
 const selectedStyleLabel = document.getElementById('selected-style-label');
+const uploadSectionContainer = document.getElementById('upload-section-container');
+const slideTextContainer = document.getElementById('slide-text-container');
+const slideContentInput = document.getElementById('slide-content-input');
 const fileInput = document.getElementById('file-input');
 const dropArea = document.getElementById('drop-area');
 const imagePreviewContainer = document.getElementById('image-preview-container');
@@ -236,22 +240,47 @@ window.removeImage = (index) => {
     updatePreviews();
 };
 
+// Mode Switcher Logic
+let currentMode = 'product'; // 'product' or 'slide'
+
+appModeSelect.addEventListener('change', (e) => {
+    currentMode = e.target.value;
+    if (currentMode === 'product') {
+        uploadSectionContainer.classList.remove('hidden');
+        slideTextContainer.classList.add('hidden');
+    } else {
+        uploadSectionContainer.classList.add('hidden');
+        slideTextContainer.classList.remove('hidden');
+    }
+});
+
 // Generation Trigger
 generateBtn.addEventListener('click', async () => {
-    if (selectedFiles.length === 0) {
+    if (currentMode === 'product' && selectedFiles.length === 0) {
         alert('Najpierw wgraj co najmniej jedno zdjęcie produktu!');
+        return;
+    }
+    
+    if (currentMode === 'slide' && slideContentInput.value.trim() === '') {
+        alert('Wklej treść slajdu!');
         return;
     }
 
     if (!selectedStyleId) {
-        alert('Wybierz studio!');
+        alert('Wybierz styl!');
         return;
     }
 
     const formData = new FormData();
-    selectedFiles.forEach(file => {
-        formData.append('images', file);
-    });
+    formData.append('mode', currentMode);
+
+    if (currentMode === 'product') {
+        selectedFiles.forEach(file => {
+            formData.append('images', file);
+        });
+    } else {
+        formData.append('slideContent', slideContentInput.value.trim());
+    }
     
     formData.append('styleId', selectedStyleId);
 
